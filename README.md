@@ -1,0 +1,7 @@
+curl 'https://immi.homeaffairs.gov.au/_layouts/15/api/GPT.aspx/GetProcessGuideInfo' \
+  -H 'accept: application/json;odata=verbose' \
+  -H 'content-type: application/json;odata=verbose' \
+  -H 'x-requested-with: XMLHttpRequest' \
+  --data-raw '{"gptRequest":{"VisaSubclassCode":"500","StreamCode":"45"}}'
+
+{"d":{"__type":"Internet.Domain.JsonResponse","success":true,"data":[{"VisaSubclassText":"Student visa (subclass 500)","VisaSubclassCode":"500","StreamCode":"45","StreamText":"Postgraduate Research Sector","VisaUrl":"/visas/getting-a-visa/visa-listing/student-500","Percent75":"107","Percent90":"202","Percent25":"3","Percent50":"21","Percent75Text":"4 Months","Percent90Text":"7 Months","Percent25Text":"3 Days","Percent50Text":"21 Days","ProcessGuideMaxDays":"357","ProcessGuideInfo":"\u003cp\u003eWe are processing student visa applications lodged outside Australia under\u0026#160;\u003ca href=\u0027/support-subsite/files/ministerial-direction-111.pdf\u0027\u003eMinisterial Direction No.\u0026#160;111\u003c/a\u003e. For more information see \u003ca href=\u0027/visas/getting-a-visa/visa-listing/student-500#About\u0027\u003eAbout this visa\u003c/a\u003e.\u0026#160;We recommend applications be lodged well in advance of course commencement and with all supporting documentation.\u003c/p\u003e\u003cbr\u003e"}],"message":null}}
