@@ -6,7 +6,7 @@ Lightweight Visa Processing Times Visualization
 import csv
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
-from datetime import datetime, timedelta
+from datetime import datetime
 
 def main():
     # Load data
@@ -49,31 +49,18 @@ def main():
                        bbox=dict(boxstyle="round,pad=0.2", facecolor=color, alpha=0.3))
     
     # Reference lines
-    target_date = datetime.strptime("2025-07-22", "%Y-%m-%d")
+    start_date = datetime.strptime("2025-07-22", "%Y-%m-%d")
     today = datetime.now()
-    days_to_target = (target_date - today).days
-    days_difference = abs(days_to_target)
-    
-    chart_start = datetime.strptime("2025-07-22", "%Y-%m-%d")
-    chart_end = today
-    if chart_end < chart_start:
-        chart_start, chart_end = chart_end, chart_start
-    
-    # Target date line (red dashed)
-    if days_to_target >= 0:
-        ax.plot([chart_start, chart_end], [days_to_target, days_to_target], 
-                color='red', linewidth=3, linestyle='--', alpha=0.8,
-                label=f'Days to 2025-07-22: {days_to_target} days')
-        ax.axvline(x=target_date, color='red', linestyle=':', linewidth=2, alpha=0.5)
+    days_difference = abs((start_date - today).days)
     
     # Absolute difference line (orange solid)
-    ax.plot([chart_start, chart_end], [days_difference, days_difference], 
+    ax.plot([start_date, today], [0, days_difference], 
             color='orange', linewidth=3, linestyle='-', alpha=0.8,
             label=f'Days difference: {days_difference} days')
     
     # Chart formatting
-    ax.set_xlim(chart_start, chart_end)
-    ax.set_ylim(0, max([max(vals) for _, vals, _ in percentiles] + [days_difference, days_to_target if days_to_target >= 0 else 0]) * 1.1)
+    ax.set_xlim(start_date, today)
+    ax.set_ylim(0, max([max(vals) for _, vals, _ in percentiles] + [days_difference, days_difference]) * 1.1)
     
     ax.set_ylabel('Processing Time (Days)', fontweight='bold', fontsize=12)
     ax.set_xlabel('Data Collection Date', fontweight='bold', fontsize=12)
@@ -84,7 +71,7 @@ def main():
     
     # Date formatting
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
-    date_span = (chart_end - chart_start).days
+    date_span = (start_date - today).days
     interval = 1 if date_span <= 7 else 3 if date_span <= 30 else 7
     ax.xaxis.set_major_locator(mdates.DayLocator(interval=interval))
     plt.xticks(rotation=45)
@@ -98,7 +85,7 @@ def main():
     info_text = f"""Latest Processing Times ({latest['datetime'].date()}):
 • 25%: {latest['percent_25']} days • 50%: {latest['percent_50']} days
 • 75%: {latest['percent_75']} days • 90%: {latest['percent_90']} days
-• Max: {latest['process_guide_max_days']} days • Target: {days_to_target} days"""
+• Max: {latest['process_guide_max_days']} days • Target: {days_difference} days"""
     
     plt.figtext(0.02, 0.02, info_text, fontsize=9, 
                 bbox=dict(boxstyle="round,pad=0.5", facecolor="lightgray", alpha=0.8))
@@ -106,7 +93,7 @@ def main():
     # Save and display
     plt.savefig("visa_processing_times_trend.png", dpi=300, bbox_inches='tight')
     print("Trend chart saved as: visa_processing_times_trend.png")
-    plt.show()
+    # plt.show()
 
 if __name__ == "__main__":
     print("Generating visa processing times trend visualization...")
