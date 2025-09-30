@@ -12,7 +12,7 @@ import json
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, Optional
 
 import requests
 import schedule
@@ -23,16 +23,11 @@ class VisaTracker:
         self.csv_file = Path(csv_file)
         self.url = "https://immi.homeaffairs.gov.au/_layouts/15/api/GPT.aspx/GetProcessGuideInfo"
         self.headers = {
-            'accept': 'application/json;odata=verbose',
-            'content-type': 'application/json;odata=verbose',
-            'x-requested-with': 'XMLHttpRequest'
+            "accept": "application/json;odata=verbose",
+            "content-type": "application/json;odata=verbose",
+            "x-requested-with": "XMLHttpRequest",
         }
-        self.payload = {
-            "gptRequest": {
-                "VisaSubclassCode": "500",
-                "StreamCode": "45"
-            }
-        }
+        self.payload = {"gptRequest": {"VisaSubclassCode": "500", "StreamCode": "45"}}
         self.seen_hashes = set()
         self._load_existing_hashes()
 
@@ -42,18 +37,18 @@ class VisaTracker:
             return
 
         try:
-            with open(self.csv_file, 'r', newline='', encoding='utf-8') as f:
+            with open(self.csv_file, "r", newline="", encoding="utf-8") as f:
                 reader = csv.DictReader(f)
                 for row in reader:
-                    if 'response_hash' in row:
-                        self.seen_hashes.add(row['response_hash'])
+                    if "response_hash" in row:
+                        self.seen_hashes.add(row["response_hash"])
             print(f"Loaded {len(self.seen_hashes)} existing hashes")
         except Exception as e:
             print(f"Error loading existing hashes: {e}")
 
     def _calculate_md5(self, data: str) -> str:
         """Calculate MD5 hash of the response data"""
-        return hashlib.md5(data.encode('utf-8')).hexdigest()
+        return hashlib.md5(data.encode("utf-8")).hexdigest()
 
     def _initialize_csv(self) -> None:
         """Initialize CSV file with headers if it doesn't exist"""
@@ -61,26 +56,26 @@ class VisaTracker:
             return
 
         headers = [
-            'timestamp',
-            'response_hash',
-            'visa_subclass_text',
-            'visa_subclass_code',
-            'stream_code',
-            'stream_text',
-            'visa_url',
-            'percent_25',
-            'percent_50',
-            'percent_75',
-            'percent_90',
-            'percent_25_text',
-            'percent_50_text',
-            'percent_75_text',
-            'percent_90_text',
-            'process_guide_max_days',
-            'process_guide_info'
+            "timestamp",
+            "response_hash",
+            "visa_subclass_text",
+            "visa_subclass_code",
+            "stream_code",
+            "stream_text",
+            "visa_url",
+            "percent_25",
+            "percent_50",
+            "percent_75",
+            "percent_90",
+            "percent_25_text",
+            "percent_50_text",
+            "percent_75_text",
+            "percent_90_text",
+            "process_guide_max_days",
+            "process_guide_info",
         ]
 
-        with open(self.csv_file, 'w', newline='', encoding='utf-8') as f:
+        with open(self.csv_file, "w", newline="", encoding="utf-8") as f:
             writer = csv.writer(f)
             writer.writerow(headers)
         print(f"Initialized CSV file: {self.csv_file}")
@@ -89,15 +84,12 @@ class VisaTracker:
         """Fetch visa processing data from the API"""
         try:
             response = requests.post(
-                self.url,
-                headers=self.headers,
-                json=self.payload,
-                timeout=30
+                self.url, headers=self.headers, json=self.payload, timeout=30
             )
             response.raise_for_status()
 
             data = response.json()
-            if data.get('d', {}).get('success'):
+            if data.get("d", {}).get("success"):
                 return data
             else:
                 print(f"API returned success=false: {data}")
@@ -115,29 +107,29 @@ class VisaTracker:
         self._initialize_csv()
 
         # Extract the first item from the data array
-        visa_info = data['d']['data'][0] if data['d']['data'] else {}
+        visa_info = data["d"]["data"][0] if data["d"]["data"] else {}
 
         row = [
             datetime.now().isoformat(),
             response_hash,
-            visa_info.get('VisaSubclassText', ''),
-            visa_info.get('VisaSubclassCode', ''),
-            visa_info.get('StreamCode', ''),
-            visa_info.get('StreamText', ''),
-            visa_info.get('VisaUrl', ''),
-            visa_info.get('Percent25', ''),
-            visa_info.get('Percent50', ''),
-            visa_info.get('Percent75', ''),
-            visa_info.get('Percent90', ''),
-            visa_info.get('Percent25Text', ''),
-            visa_info.get('Percent50Text', ''),
-            visa_info.get('Percent75Text', ''),
-            visa_info.get('Percent90Text', ''),
-            visa_info.get('ProcessGuideMaxDays', ''),
-            visa_info.get('ProcessGuideInfo', '')
+            visa_info.get("VisaSubclassText", ""),
+            visa_info.get("VisaSubclassCode", ""),
+            visa_info.get("StreamCode", ""),
+            visa_info.get("StreamText", ""),
+            visa_info.get("VisaUrl", ""),
+            visa_info.get("Percent25", ""),
+            visa_info.get("Percent50", ""),
+            visa_info.get("Percent75", ""),
+            visa_info.get("Percent90", ""),
+            visa_info.get("Percent25Text", ""),
+            visa_info.get("Percent50Text", ""),
+            visa_info.get("Percent75Text", ""),
+            visa_info.get("Percent90Text", ""),
+            visa_info.get("ProcessGuideMaxDays", ""),
+            visa_info.get("ProcessGuideInfo", ""),
         ]
 
-        with open(self.csv_file, 'a', newline='', encoding='utf-8') as f:
+        with open(self.csv_file, "a", newline="", encoding="utf-8") as f:
             writer = csv.writer(f)
             writer.writerow(row)
 
@@ -151,7 +143,7 @@ class VisaTracker:
             return
 
         # Calculate hash of the response data
-        response_str = json.dumps(data['d']['data'], sort_keys=True)
+        response_str = json.dumps(data["d"]["data"], sort_keys=True)
         response_hash = self._calculate_md5(response_str)
 
         if response_hash in self.seen_hashes:
@@ -164,8 +156,8 @@ class VisaTracker:
         print(f"New data saved! Hash: {response_hash[:8]}...")
 
         # Print summary of the data
-        if data['d']['data']:
-            info = data['d']['data'][0]
+        if data["d"]["data"]:
+            info = data["d"]["data"][0]
             print(f"  Visa: {info.get('VisaSubclassText', 'N/A')}")
             print(f"  75th percentile: {info.get('Percent75Text', 'N/A')}")
             print(f"  90th percentile: {info.get('Percent90Text', 'N/A')}")
