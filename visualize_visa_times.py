@@ -9,10 +9,10 @@ import matplotlib.dates as mdates
 from datetime import datetime
 
 
-def main():
+def main(DATA_FILE="visa_processing_times.csv", DATE_INTERVAL=7):
     # Load data
     data = []
-    with open("visa_processing_times.csv", 'r', encoding='utf-8') as file:
+    with open(DATA_FILE, 'r', encoding='utf-8') as file:
         for row in csv.DictReader(file):
             if row['timestamp']:
                 timestamp = datetime.strptime(
@@ -62,12 +62,12 @@ def main():
             label=f'Days difference: {days_difference} days')
 
     # Chart formatting
+    ax.set_xlabel('Data Collection Date', fontweight='bold', fontsize=12)
     ax.set_xlim(start_date, today)
-    ax.set_ylim(0, max([max(vals) for _, vals, _ in percentiles] +
-                [days_difference, days_difference]) * 1.1)
 
     ax.set_ylabel('Processing Time (Days)', fontweight='bold', fontsize=12)
-    ax.set_xlabel('Data Collection Date', fontweight='bold', fontsize=12)
+    ax.set_ylim(0, max([max(vals) for _, vals, _ in percentiles] +
+                [days_difference, days_difference]) * 1.1)
 
     visa_info = f"{data[0]['visa_subclass_text']} - {data[0]['stream_text']}"
     ax.set_title(f'Visa Processing Times Trend\n{visa_info}\nChart Range: 2025-07-22 to {today.strftime("%Y-%m-%d")}',
@@ -75,9 +75,7 @@ def main():
 
     # Date formatting
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
-    date_span = (start_date - today).days
-    interval = 1 if date_span <= 7 else 3 if date_span <= 30 else 7
-    ax.xaxis.set_major_locator(mdates.DayLocator(interval=interval))
+    ax.xaxis.set_major_locator(mdates.DayLocator(interval=DATE_INTERVAL))
     plt.xticks(rotation=45)
 
     ax.grid(True, alpha=0.3)

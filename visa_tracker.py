@@ -40,7 +40,7 @@ class VisaTracker:
         """Load existing MD5 hashes from CSV to avoid duplicates"""
         if not self.csv_file.exists():
             return
-        
+
         try:
             with open(self.csv_file, 'r', newline='', encoding='utf-8') as f:
                 reader = csv.DictReader(f)
@@ -59,7 +59,7 @@ class VisaTracker:
         """Initialize CSV file with headers if it doesn't exist"""
         if self.csv_file.exists():
             return
-        
+
         headers = [
             'timestamp',
             'response_hash',
@@ -79,7 +79,7 @@ class VisaTracker:
             'process_guide_max_days',
             'process_guide_info'
         ]
-        
+
         with open(self.csv_file, 'w', newline='', encoding='utf-8') as f:
             writer = csv.writer(f)
             writer.writerow(headers)
@@ -95,14 +95,14 @@ class VisaTracker:
                 timeout=30
             )
             response.raise_for_status()
-            
+
             data = response.json()
             if data.get('d', {}).get('success'):
                 return data
             else:
                 print(f"API returned success=false: {data}")
                 return None
-                
+
         except requests.exceptions.RequestException as e:
             print(f"Request failed: {e}")
             return None
@@ -113,10 +113,10 @@ class VisaTracker:
     def save_to_csv(self, data: Dict, response_hash: str) -> None:
         """Save visa data to CSV file"""
         self._initialize_csv()
-        
+
         # Extract the first item from the data array
         visa_info = data['d']['data'][0] if data['d']['data'] else {}
-        
+
         row = [
             datetime.now().isoformat(),
             response_hash,
@@ -136,7 +136,7 @@ class VisaTracker:
             visa_info.get('ProcessGuideMaxDays', ''),
             visa_info.get('ProcessGuideInfo', '')
         ]
-        
+
         with open(self.csv_file, 'a', newline='', encoding='utf-8') as f:
             writer = csv.writer(f)
             writer.writerow(row)
@@ -144,25 +144,25 @@ class VisaTracker:
     def check_and_save(self) -> None:
         """Main method to check for new data and save if unique"""
         print(f"[{datetime.now()}] Checking for visa processing updates...")
-        
+
         data = self.fetch_visa_data()
         if not data:
             print("Failed to fetch data")
             return
-        
+
         # Calculate hash of the response data
         response_str = json.dumps(data['d']['data'], sort_keys=True)
         response_hash = self._calculate_md5(response_str)
-        
+
         if response_hash in self.seen_hashes:
             print(f"Data unchanged (hash: {response_hash[:8]}...)")
             return
-        
+
         # New data found, save it
         self.seen_hashes.add(response_hash)
         self.save_to_csv(data, response_hash)
         print(f"New data saved! Hash: {response_hash[:8]}...")
-        
+
         # Print summary of the data
         if data['d']['data']:
             info = data['d']['data'][0]
@@ -174,13 +174,13 @@ class VisaTracker:
         """Run the daily scheduler"""
         print("Starting Visa Tracker - Daily monitoring active")
         print(f"CSV file: {self.csv_file.absolute()}")
-        
+
         # Schedule daily check at 9 AM
         schedule.every().day.at("09:00").do(self.check_and_save)
-        
+
         # Run once immediately
         self.check_and_save()
-        
+
         # Keep the scheduler running
         while True:
             schedule.run_pending()
@@ -194,16 +194,16 @@ class VisaTracker:
 def main():
     """Main entry point"""
     import sys
-    
+
     tracker = VisaTracker()
-    
-    if len(sys.argv) > 1 and sys.argv[1] == "--once":
-        print("Running single check...")
-        tracker.run_once()
-    else:
+
+    if len(sys.argv) > 1 and sys.argv[1] == "--scheduler":
         print("Starting daily scheduler...")
         tracker.run_scheduler()
+    else:
+        print("Running single check...")
+        tracker.run_once()
 
 
 if __name__ == "__main__":
-    main() 
+    main()
