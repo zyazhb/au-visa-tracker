@@ -1,13 +1,13 @@
 [project]
 name = "visa-tracker"
 version = "0.1.0"
-description = "Add your description here"
+description = "Track AUS visa"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "ipykernel>=6.30.1",
     "matplotlib>=3.10.3",
-    "nuitka>=2.7.12",
+    # "nuitka>=2.7.12",
     "requests>=2.32.4",
     "schedule>=1.2.2",
 ]
