@@ -106,6 +106,6 @@ def main():
         bbox=dict(boxstyle="round,pad=0.5", facecolor="lightgray", alpha=0.8),
     )
 
-    plt.savefig("visa_processing_times_trend.png", dpi=300, bbox_inches="tight")
-    print("Trend chart saved as: visa_processing_times_trend.png")
+    plt.savefig("visa_processing_times_trend.svg", bbox_inches="tight")
+    print("Trend chart saved as: visa_processing_times_trend.svg")
     return plt
