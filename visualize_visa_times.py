@@ -32,6 +32,10 @@ def main():
         ("Max Guide", "process_guide_max_days", "#8B0000"),
     ]
 
+    # Get today's date first
+    start_date = datetime(2025, 7, 22)
+    today = datetime.now()
+
     for label, key, color in percentiles:
         values = [int(row[key]) for row in data]
         ax.plot(
@@ -56,10 +60,19 @@ def main():
                 fontweight="bold",
                 bbox=dict(boxstyle="round,pad=0.2", facecolor=color, alpha=0.3),
             )
+        # Draw horizontal line from last dot to today
+        last_date = dates[-1]
+        last_value = values[-1]
+        ax.plot(
+            [last_date, today],
+            [last_value, last_value],
+            color=color,
+            linewidth=2,
+            linestyle="--",
+            alpha=0.5,
+        )
 
     # Reference line
-    start_date = datetime(2025, 7, 22)
-    today = datetime.now()
     days_diff = (today - start_date).days
     ax.plot(
         [start_date, today],
