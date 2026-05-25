@@ -33,7 +33,7 @@ def main():
     ]
 
     # Get today's date first
-    start_date = datetime(2025, 7, 22)
+    start_date = datetime(2026, 5, 5)
     today = datetime.now()
 
     for label, key, color in percentiles:
@@ -92,7 +92,7 @@ def main():
 
     visa_info = f"{data[0]['visa_subclass_text']} - {data[0]['stream_text']}"
     ax.set_title(
-        f"Visa Processing Times Trend\n{visa_info}\nChart Range: 2025-07-22 to {today.strftime('%Y-%m-%d')}",
+        f"Visa Processing Times Trend\n{visa_info}\nChart Range: 2026-05-05 to {today.strftime('%Y-%m-%d')}",
         fontweight="bold",
         fontsize=14,
         pad=20,
